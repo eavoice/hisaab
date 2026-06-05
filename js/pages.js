@@ -8,9 +8,18 @@ const Pages = {
     const curMonth = new Date().toISOString().substring(0,7);
     const [custs,facts,sales,purch] = await Promise.all([DB.getAll('customers'),DB.getAll('factories'),DB.getAll('sales'),DB.getAll('purchases')]);
     for(const c of custs){ const b=await DB.customerBalance(c.id); if(b>0) recv+=b; }
-    for(const f of facts){ const b=await DB.factoryBalance(f.id);  if(b>0) pay+=b; }
     salesTotal = sales.filter(s=>s.date?.startsWith(curMonth)).reduce((a,b)=>a+(b.total||0),0);
     purchTotal = purch.filter(p=>p.date?.startsWith(curMonth)).reduce((a,b)=>a+(b.total||0),0);
+
+    const generateSparkline = (dataArray, colorStr) => {
+      const max = Math.max(...dataArray, 1);
+      return `<div style="display:flex;align-items:flex-end;gap:4px;height:32px;opacity:0.4;position:absolute;bottom:16px;right:16px;width:60px">
+        ${dataArray.map(val => `<div style="flex:1;background:${colorStr};height:${Math.max((val/max)*100, 10)}%;border-radius:2px;transition:height 0.3s"></div>`).join('')}
+      </div>`;
+    };
+    const last7 = [...Array(7)].map((_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(6-i)); return d.toISOString().substring(0,10); });
+    const sTrend = last7.map(dt => sales.filter(s=>s.date===dt).reduce((a,b)=>a+(b.total||0),0));
+    const pTrend = last7.map(dt => purch.filter(p=>p.date===dt).reduce((a,b)=>a+(b.total||0),0));
 
     const lastBackupTs = Number(localStorage.getItem('lastBackupTimestamp')||0);
     const lastChangeTs = Number(localStorage.getItem('lastChangeTimestamp')||0);
@@ -36,18 +45,31 @@ const Pages = {
 
     return `<div class="page-section">
       ${bannerHtml}
-      <div class="stats-grid" style="padding:0;margin-bottom:20px">
-        <div class="stat-card receivable"><div class="stat-label">To Receive</div><div class="stat-value green">${fmt(recv)}</div><div class="stat-sub">From customers</div></div>
-        <div class="stat-card payable"><div class="stat-label">To Pay</div><div class="stat-value red">${fmt(pay)}</div><div class="stat-sub">To factories</div></div>
-        <div class="stat-card sales-total"><div class="stat-label">Sales (${curMonth})</div><div class="stat-value indigo">${fmt(salesTotal)}</div></div>
-        <div class="stat-card purchase-total"><div class="stat-label">Purchases (${curMonth})</div><div class="stat-value blue">${fmt(purchTotal)}</div></div>
+      <div class="stats-grid" style="padding:0;margin-bottom:24px">
+        <div class="stat-card receivable"><div class="stat-label">To Receive</div><div class="stat-value green">${fmt(recv)}</div><div class="stat-sub">From customers</div>
+          <svg style="position:absolute;top:16px;right:16px;opacity:0.2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="stat-card payable"><div class="stat-label">To Pay</div><div class="stat-value red">${fmt(pay)}</div><div class="stat-sub">To factories</div>
+          <svg style="position:absolute;top:16px;right:16px;opacity:0.2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <div class="stat-card sales-total"><div class="stat-label">Sales (${curMonth})</div><div class="stat-value indigo">${fmt(salesTotal)}</div>${generateSparkline(sTrend, 'var(--primary)')}</div>
+        <div class="stat-card purchase-total"><div class="stat-label">Purchases (${curMonth})</div><div class="stat-value blue">${fmt(purchTotal)}</div>${generateSparkline(pTrend, 'var(--sky)')}</div>
       </div>
       <h2 class="section-title">Quick Actions</h2>
       <div class="quick-actions" style="padding:0">
-        <div class="quick-action" onclick="App.newSale()"><div class="qa-icon" style="background:var(--primary-dim);color:var(--primary-light)">🧾</div><div><div class="qa-label">New Bill</div><div class="qa-sub">Customer Sale</div></div></div>
-        <div class="quick-action" onclick="App.customerPayment()"><div class="qa-icon" style="background:var(--success-dim);color:var(--success)">💰</div><div><div class="qa-label">Receive Pay</div><div class="qa-sub">From Customer</div></div></div>
-        <div class="quick-action" onclick="App.newPurchase()"><div class="qa-icon" style="background:var(--sky-dim);color:var(--sky)">🏭</div><div><div class="qa-label">New Purchase</div><div class="qa-sub">From Factory</div></div></div>
-        <div class="quick-action" onclick="App.factoryPayment()"><div class="qa-icon" style="background:var(--danger-dim);color:var(--danger)">💸</div><div><div class="qa-label">Pay Factory</div><div class="qa-sub">Record outflow</div></div></div>
+        <div class="quick-action" onclick="App.newSale()"><div class="qa-icon" style="background:var(--primary-dim);color:var(--primary-light)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div><div><div class="qa-label">New Bill</div><div class="qa-sub">Customer Sale</div></div></div>
+        
+        <div class="quick-action" onclick="App.customerPayment()"><div class="qa-icon" style="background:var(--success-dim);color:var(--success)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+        </div><div><div class="qa-label">Receive Pay</div><div class="qa-sub">From Customer</div></div></div>
+        
+        <div class="quick-action" onclick="App.newPurchase()"><div class="qa-icon" style="background:var(--sky-dim);color:var(--sky)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg>
+        </div><div><div class="qa-label">New Purchase</div><div class="qa-sub">From Factory</div></div></div>
+        
+        <div class="quick-action" onclick="App.factoryPayment()"><div class="qa-icon" style="background:var(--danger-dim);color:var(--danger)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        </div><div><div class="qa-label">Pay Factory</div><div class="qa-sub">Record outflow</div></div></div>
       </div></div>`;
   },
 
