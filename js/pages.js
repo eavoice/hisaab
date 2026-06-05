@@ -24,6 +24,7 @@ const Pages = {
     const lastBackupTs = Number(localStorage.getItem('lastBackupTimestamp')||0);
     const lastChangeTs = Number(localStorage.getItem('lastChangeTimestamp')||0);
     let bannerHtml = '';
+    const hasAnyData = lastChangeTs > 0 || custs.length > 0 || facts.length > 0;
     if (lastBackupTs > 0) {
       const dateStr = new Date(lastBackupTs).toLocaleString('en-IN', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true});
       if (lastChangeTs > lastBackupTs) {
@@ -36,7 +37,7 @@ const Pages = {
           <div style="font-weight:600">All data backed up</div><div style="opacity:0.8;margin-top:2px">Last backup: ${dateStr}</div>
         </div>`;
       }
-    } else {
+    } else if (hasAnyData) {
       bannerHtml = `<div style="background:var(--danger-dim);color:var(--danger);padding:10px 14px;border-radius:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:13px">
           <div><div style="font-weight:600">No Backup Found</div><div style="opacity:0.8;margin-top:2px">Secure your data now</div></div>
           <button class="btn btn-primary btn-sm" onclick="App.exportData()">Backup</button>
