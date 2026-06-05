@@ -1,10 +1,10 @@
 /* ===== TOKENS ===== */
 :root {
-  --bg: #0A0F1E;
-  --surface: #111827;
-  --card: #1a2236;
-  --card-hover: #1f2a42;
-  --border: rgba(255,255,255,0.08);
+  --bg: #050A15;
+  --surface: rgba(15, 23, 42, 0.75);
+  --card: #131C31;
+  --card-hover: #1E293B;
+  --border: rgba(255,255,255,0.06);
   --border-focus: rgba(99,102,241,0.6);
   --primary: #6366F1;
   --primary-light: #818CF8;
@@ -37,6 +37,7 @@ body {
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
 }
 button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
 input, select, textarea { font-family: inherit; color: inherit; }
@@ -54,6 +55,8 @@ a { color: inherit; text-decoration: none; }
 .app-header {
   height: var(--header-h);
   background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   z-index: 10;
@@ -73,8 +76,8 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; font-weight: 700; color: white;
 }
-.app-title { font-size: 17px; font-weight: 700; line-height: 1.1; }
-.app-subtitle { font-size: 11px; color: var(--text-3); line-height: 1; }
+.app-title { font-size: 19px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.app-subtitle { font-size: 12px; color: var(--text-3); line-height: 1; font-weight: 500; }
 .header-right { display: flex; gap: 8px; align-items: center; }
 
 .app-main {
@@ -91,6 +94,8 @@ a { color: inherit; text-decoration: none; }
   bottom: 0; left: 0; right: 0;
   height: var(--nav-h);
   background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   display: flex;
   z-index: 100;
@@ -154,18 +159,12 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   overflow: hidden;
 }
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-.stat-card.receivable::before { background: linear-gradient(90deg, var(--success), #059669); }
-.stat-card.payable::before { background: linear-gradient(90deg, var(--danger), #DC2626); }
-.stat-card.sales-total::before { background: linear-gradient(90deg, var(--primary), #7C3AED); }
-.stat-card.purchase-total::before { background: linear-gradient(90deg, var(--sky), #0284C7); }
+.stat-card.receivable { background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(16,185,129,0) 100%), var(--card); border: 1px solid rgba(16,185,129,0.2); }
+.stat-card.payable { background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(239,68,68,0) 100%), var(--card); border: 1px solid rgba(239,68,68,0.2); }
+.stat-card.sales-total { background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0) 100%), var(--card); border: 1px solid rgba(99,102,241,0.2); }
+.stat-card.purchase-total { background: linear-gradient(135deg, rgba(14,165,233,0.1) 0%, rgba(14,165,233,0) 100%), var(--card); border: 1px solid rgba(14,165,233,0.2); }
 .stat-label { font-size: 11px; color: var(--text-3); font-weight: 500; margin-bottom: 6px; }
-.stat-value { font-size: 20px; font-weight: 700; line-height: 1.1; }
+.stat-value { font-size: 24px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; }
 .stat-value.green { color: var(--success); }
 .stat-value.red { color: var(--danger); }
 .stat-value.indigo { color: var(--primary-light); }
@@ -373,12 +372,13 @@ a { color: inherit; text-decoration: none; }
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.4);
   z-index: 300;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 .modal-overlay.open { opacity: 1; pointer-events: all; }
 
