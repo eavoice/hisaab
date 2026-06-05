@@ -451,6 +451,12 @@ const App = {
   },
 
   async checkDailyBackup() {
+    const lastChangeTs = Number(localStorage.getItem('lastChangeTimestamp')||0);
+    const [custs, facts] = await Promise.all([DB.getAll('customers'), DB.getAll('factories')]);
+    const hasAnyData = lastChangeTs > 0 || custs.length > 0 || facts.length > 0;
+    
+    if (!hasAnyData) return; // Do not bother new users with no data
+    
     const lastTs = Number(localStorage.getItem('lastBackupTimestamp')||0);
     const msInDay = 24 * 60 * 60 * 1000;
     if (Date.now() - lastTs > msInDay) {
