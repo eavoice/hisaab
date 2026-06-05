@@ -45,16 +45,8 @@ const Pages = {
 
     return `<div class="page-section">
       ${bannerHtml}
-      <div class="stats-grid" style="padding:0;margin-bottom:24px">
-        <div class="stat-card receivable"><div class="stat-label">To Receive</div><div class="stat-value green">${fmt(recv)}</div><div class="stat-sub">From customers</div>
-          <svg style="position:absolute;top:16px;right:16px;opacity:0.2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="stat-card payable"><div class="stat-label">To Pay</div><div class="stat-value red">${fmt(pay)}</div><div class="stat-sub">To factories</div>
-          <svg style="position:absolute;top:16px;right:16px;opacity:0.2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-        <div class="stat-card sales-total"><div class="stat-label">Sales (${curMonth})</div><div class="stat-value indigo">${fmt(salesTotal)}</div>${generateSparkline(sTrend, 'var(--primary)')}</div>
-        <div class="stat-card purchase-total"><div class="stat-label">Purchases (${curMonth})</div><div class="stat-value blue">${fmt(purchTotal)}</div>${generateSparkline(pTrend, 'var(--sky)')}</div>
-      </div>
       <h2 class="section-title">Quick Actions</h2>
-      <div class="quick-actions" style="padding:0">
+      <div class="quick-actions" style="padding:0;margin-bottom:24px">
         <div class="quick-action" onclick="App.newSale()"><div class="qa-icon" style="background:var(--primary-dim);color:var(--primary-light)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         </div><div><div class="qa-label">New Bill</div><div class="qa-sub">Customer Sale</div></div></div>
@@ -70,7 +62,17 @@ const Pages = {
         <div class="quick-action" onclick="App.factoryPayment()"><div class="qa-icon" style="background:var(--danger-dim);color:var(--danger)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
         </div><div><div class="qa-label">Pay Factory</div><div class="qa-sub">Record outflow</div></div></div>
-      </div></div>`;
+      </div>
+      <h2 class="section-title">Overview</h2>
+      <div class="stats-grid" style="padding:0;margin-bottom:24px">
+        <div class="stat-card receivable"><div class="stat-label">To Receive</div><div class="stat-value green">${fmt(recv)}</div><div class="stat-sub">From customers</div>
+          <svg style="position:absolute;top:16px;right:16px;opacity:0.2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="stat-card payable"><div class="stat-label">To Pay</div><div class="stat-value red">${fmt(pay)}</div><div class="stat-sub">To factories</div>
+          <svg style="position:absolute;top:16px;right:16px;opacity:0.2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <div class="stat-card sales-total"><div class="stat-label">Sales (${curMonth})</div><div class="stat-value indigo">${fmt(salesTotal)}</div>${generateSparkline(sTrend, 'var(--primary)')}</div>
+        <div class="stat-card purchase-total"><div class="stat-label">Purchases (${curMonth})</div><div class="stat-value blue">${fmt(purchTotal)}</div>${generateSparkline(pTrend, 'var(--sky)')}</div>
+      </div>
+    </div>`;
   },
 
   async sales() {

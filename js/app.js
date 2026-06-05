@@ -411,23 +411,44 @@ const App = {
   },
 
   async exportData() {
-    const data=await DB.exportAll();
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    const fileName = `Hisaab-Backup-${today()}.txt`; // .txt allows Android Web Share API to work reliably
-    if (navigator.share && navigator.canShare) {
+    Toast.show('Preparing backup...', 'info');
+    const data = await DB.exportAll();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' });
+    const fileName = `Hisaab-Backup-${today()}.txt`;
+    const file = new File([blob], fileName, { type: 'text/plain' });
+    const canShare = navigator.share && navigator.canShare && navigator.canShare({ files: [file] });
+
+    window._hisaabDownloadTemp = () => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `Hisaab-Backup-${today()}.json`; a.click(); URL.revokeObjectURL(url);
+      localStorage.setItem('lastBackupTimestamp', Date.now());
+      if (App.currentRoute === 'dashboard') App.navigate('dashboard');
+      Toast.show('Backup downloaded', 'success');
+      Modal.close();
+    };
+    window._hisaabShareTemp = async () => {
       try {
-        const file = new File([blob], fileName, { type: 'text/plain' });
-        if (navigator.canShare({ files: [file] })) { 
-          await navigator.share({ files:[file], title:'Hisaab Backup' }); 
-          localStorage.setItem('lastBackupTimestamp', Date.now());
-          if (App.currentRoute === 'dashboard') App.navigate('dashboard');
-          return; 
-        }
-      } catch(e) { if (e.name==='AbortError') return; }
-    }
-    const url=URL.createObjectURL(blob), a=document.createElement('a');
-    a.href=url; a.download=`Hisaab-Backup-${today()}.json`; a.click(); URL.revokeObjectURL(url);
-    localStorage.setItem('lastBackupTimestamp', Date.now());
+        await navigator.share({ files: [file], title: 'Hisaab Backup' });
+        localStorage.setItem('lastBackupTimestamp', Date.now());
+        if (App.currentRoute === 'dashboard') App.navigate('dashboard');
+        Modal.close();
+      } catch (e) {
+        if (e.name !== 'AbortError') window._hisaabDownloadTemp();
+      }
+    };
+
+    const body = `
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:48px;margin-bottom:16px">📦</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">Backup Ready</div>
+        <p style="color:var(--text-3);font-size:14px;margin-bottom:24px;line-height:1.5">Your database backup has been generated. Please save it securely to Google Drive or email it to yourself.</p>
+        ${canShare ? `<button class="btn btn-primary btn-full mb-16" onclick="window._hisaabShareTemp()">Share via App (Drive/Email)</button>` : ''}
+        <button class="btn btn-outline btn-full" onclick="window._hisaabDownloadTemp()">Download File</button>
+      </div>
+    `;
+    Modal.open('Backup Data', body, `<button class="btn btn-ghost btn-full" onclick="Modal.close()">Cancel</button>`);
+  },
     if (App.currentRoute === 'dashboard') App.navigate('dashboard');
   },
 
