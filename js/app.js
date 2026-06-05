@@ -9,6 +9,8 @@ const App = {
   async init() {
     const company = await DB.getSetting('companyName');
     if (company) document.querySelector('.app-title').textContent = company;
+    const theme = await DB.getSetting('themeColor') || 'indigo';
+    this.applyTheme(theme);
     this.navigate('dashboard');
     setTimeout(() => this.checkDailyBackup(), 2000);
 
@@ -444,7 +446,32 @@ const App = {
     const r=new FileReader();
     r.onload=async(e)=>{ try { const d=JSON.parse(e.target.result); if(confirmDialog('Overwrite all current data?')){ await DB.importAll(d); Toast.show('Imported','success'); setTimeout(()=>location.reload(),1000); } } catch{ Toast.show('Invalid file','error'); } };
     r.readAsText(input.files[0]);
+  },
+  
+  async saveTheme(val) {
+    await DB.setSetting('themeColor', val);
+    this.applyTheme(val);
+  },
+  applyTheme(color) {
+    const root = document.documentElement;
+    if (color === 'emerald') {
+      root.style.setProperty('--primary', '#14b8a6');
+      root.style.setProperty('--primary-light', '#2dd4bf');
+      root.style.setProperty('--primary-dim', 'rgba(20,184,166,0.15)');
+    } else if (color === 'sky') {
+      root.style.setProperty('--primary', '#38bdf8');
+      root.style.setProperty('--primary-light', '#7dd3fc');
+      root.style.setProperty('--primary-dim', 'rgba(56,189,248,0.15)');
+    } else if (color === 'rose') {
+      root.style.setProperty('--primary', '#f43f5e');
+      root.style.setProperty('--primary-light', '#fb7185');
+      root.style.setProperty('--primary-dim', 'rgba(244,63,94,0.15)');
+    } else { // indigo
+      root.style.setProperty('--primary', '#6366f1');
+      root.style.setProperty('--primary-light', '#818cf8');
+      root.style.setProperty('--primary-dim', 'rgba(99,102,241,0.15)');
+    }
   }
 };
 
-window.onload = ()=>App.init();
+window.addEventListener('DOMContentLoaded', () => App.init());

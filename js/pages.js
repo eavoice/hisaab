@@ -139,7 +139,7 @@ const Pages = {
           <input type="date" id="pf-to"   class="form-input" style="flex:1" onchange="App.applyPurchaseFilter()">
         </div>
       </div>
-      <div id="purchases-list" class="list-container" style="padding-top:12px"><div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div></div>`;
+      <div id="purchase-list" class="list-container" style="padding-top:12px"><div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div></div>`;
   },
 
   async renderPurchaseList(filter) {
@@ -303,7 +303,7 @@ const Pages = {
         <div class="seg-tab" onclick="App.switchMasterTab('factories')">Factories</div>
         <div class="seg-tab" onclick="App.switchMasterTab('products')">Products</div>
         <div class="seg-tab" onclick="App.switchMasterTab('transports')">Transport</div>
-        <div class="seg-tab" data-tab="products" onclick="App.switchMasterTab('products')">Products</div>
+        <div class="seg-tab" data-tab="settings" onclick="App.switchMasterTab('settings')">Settings</div>
       </div>
       <div id="master-list-container" class="list-container" data-active-type="customers"><div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div></div></div>
     </div>`;
@@ -312,9 +312,19 @@ const Pages = {
   async renderMasterList(type) {
     if(type==='settings'){
       const co=await DB.getSetting('companyName')||'';
+      const themeOpt=await DB.getSetting('themeColor')||'indigo';
       return `<div class="form-group"><label class="form-label">Company / Trader Name (shown on bills)</label>
         <input type="text" id="setting-company" class="form-input" value="${esc(co)}" placeholder="Your business name"></div>
         <button class="btn btn-primary btn-full" onclick="App.saveCompanyName()">Save Name</button>
+        <div class="divider"></div>
+        <div class="form-group"><label class="form-label">Theme Color</label>
+        <select id="setting-theme" class="select-input" onchange="App.saveTheme(this.value)">
+          <option value="indigo" ${themeOpt==='indigo'?'selected':''}>Midnight Indigo</option>
+          <option value="emerald" ${themeOpt==='emerald'?'selected':''}>Emerald Green</option>
+          <option value="sky" ${themeOpt==='sky'?'selected':''}>Ocean Blue</option>
+          <option value="rose" ${themeOpt==='rose'?'selected':''}>Ruby Rose</option>
+        </select></div>
+        <div class="divider"></div>
         <div class="divider"></div>
         <label class="form-label">Data Backup</label>
         <button class="btn btn-outline btn-full mb-16" onclick="App.exportData()">⬇ Export Backup</button>
