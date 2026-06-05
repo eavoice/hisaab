@@ -449,8 +449,6 @@ const App = {
     `;
     Modal.open('Backup Data', body, `<button class="btn btn-ghost btn-full" onclick="Modal.close()">Cancel</button>`);
   },
-    if (App.currentRoute === 'dashboard') App.navigate('dashboard');
-  },
 
   async checkDailyBackup() {
     const lastTs = Number(localStorage.getItem('lastBackupTimestamp')||0);
