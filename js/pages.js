@@ -72,7 +72,7 @@ const Pages = {
           <input type="date" id="sf-to"   class="form-input" style="flex:1" onchange="App.applySalesFilter()">
         </div>
       </div>
-      <div id="sales-list" class="list-container" style="padding-top:12px"><div class="spinner"></div></div>`;
+      <div id="sales-list" class="list-container" style="padding-top:12px"><div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div></div>`;
   },
 
   async renderSalesList(filter) {
@@ -117,7 +117,7 @@ const Pages = {
           <input type="date" id="pf-to"   class="form-input" style="flex:1" onchange="App.applyPurchaseFilter()">
         </div>
       </div>
-      <div id="purchase-list" class="list-container" style="padding-top:12px"><div class="spinner"></div></div>`;
+      <div id="purchases-list" class="list-container" style="padding-top:12px"><div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div></div>`;
   },
 
   async renderPurchaseList(filter) {
@@ -150,7 +150,7 @@ const Pages = {
         <div class="seg-tab" onclick="App.switchReportTab('products')">By Product</div>
         <div class="seg-tab" onclick="App.switchReportTab('txns')">Transactions</div>
       </div>
-      <div id="report-content"><div class="spinner"></div></div></div>`;
+      <div id="report-content"><div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div></div></div>`;
   },
 
   async reportSummary() {
@@ -281,9 +281,10 @@ const Pages = {
         <div class="seg-tab" onclick="App.switchMasterTab('factories')">Factories</div>
         <div class="seg-tab" onclick="App.switchMasterTab('products')">Products</div>
         <div class="seg-tab" onclick="App.switchMasterTab('transports')">Transport</div>
-        <div class="seg-tab" onclick="App.switchMasterTab('settings')">Settings</div>
+        <div class="seg-tab" data-tab="products" onclick="App.switchMasterTab('products')">Products</div>
       </div>
-      <div id="master-list-container"><div class="spinner"></div></div></div>`;
+      <div id="master-list-container" class="list-container" data-active-type="customers"><div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div></div></div>
+    </div>`;
   },
 
   async renderMasterList(type) {
