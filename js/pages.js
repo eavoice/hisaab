@@ -193,7 +193,7 @@ const Pages = {
       <div style="width:100%;display:flex;gap:3px;align-items:flex-end;height:60px">
         <div style="flex:1;background:var(--primary);border-radius:3px 3px 0 0;height:${Math.round(v.s/maxV*60)}px;min-height:2px"></div>
         <div style="flex:1;background:var(--sky);border-radius:3px 3px 0 0;height:${Math.round(v.p/maxV*60)}px;min-height:2px"></div>
-      </div><div style="font-size:10px;color:var(--text-3)">${m.substring(5)}</div></div>`).join('');
+      </div><div style="font-size:10px;color:var(--text-3)">${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m.substring(5))-1]}</div></div>`).join('');
     return `
       <div class="report-summary">
         <div class="report-row"><span>Total Sales</span><span class="amount-positive">${fmt(tS)}</span></div>
