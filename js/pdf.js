@@ -90,9 +90,10 @@ const PDF = {
 
     const sales    = inRange(allSales).sort((a,b) => a.date.localeCompare(b.date));
     const payments = inRange(allPayments).sort((a,b) => a.date.localeCompare(b.date));
+    const ob = Number(customer.openingBalance) || 0;
     const totalSales    = sales.reduce((s,r) => s + (r.total||0), 0);
     const totalPayments = payments.reduce((s,r) => s + (r.amount||0), 0);
-    const outstanding   = totalSales - totalPayments;
+    const outstanding   = ob + totalSales - totalPayments;
 
     const company = await DB.getSetting('companyName');
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -143,11 +144,12 @@ const PDF = {
     // Summary
     if (y > 230) { doc.addPage(); y = 20; }
     doc.setFontSize(10); doc.setFont('helvetica', 'bold');
-    doc.text(`Total Billed:    Rs. ${totalSales.toLocaleString('en-IN')}`, 14, y);
-    doc.text(`Total Received:  Rs. ${totalPayments.toLocaleString('en-IN')}`, 14, y + 7);
+    doc.text(`Opening Balance: Rs. ${ob.toLocaleString('en-IN')}`, 14, y);
+    doc.text(`Total Billed:    Rs. ${totalSales.toLocaleString('en-IN')}`, 14, y + 7);
+    doc.text(`Total Received:  Rs. ${totalPayments.toLocaleString('en-IN')}`, 14, y + 14);
     doc.setFontSize(12);
     doc.setTextColor(outstanding > 0 ? 220 : 16, outstanding > 0 ? 38 : 185, outstanding > 0 ? 38 : 129);
-    doc.text(`Outstanding: Rs. ${outstanding.toLocaleString('en-IN')}`, 14, y + 16);
+    doc.text(`Outstanding: Rs. ${outstanding.toLocaleString('en-IN')}`, 14, y + 23);
 
     doc.setFontSize(8); doc.setTextColor(120);
     const genDate = new Date().toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
@@ -170,9 +172,10 @@ const PDF = {
 
     const purchases = inRange(allPurch).sort((a,b) => a.date.localeCompare(b.date));
     const payments  = inRange(allPayments).sort((a,b) => a.date.localeCompare(b.date));
+    const ob = Number(factory.openingBalance) || 0;
     const totalPurch    = purchases.reduce((s,r) => s + (r.total||0), 0);
     const totalPayments = payments.reduce((s,r) => s + (r.amount||0), 0);
-    const outstanding   = totalPurch - totalPayments;
+    const outstanding   = ob + totalPurch - totalPayments;
 
     const company = await DB.getSetting('companyName');
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -219,11 +222,12 @@ const PDF = {
 
     if (y > 230) { doc.addPage(); y = 20; }
     doc.setFontSize(10); doc.setFont('helvetica', 'bold');
-    doc.text(`Total Purchased: Rs. ${totalPurch.toLocaleString('en-IN')}`, 14, y);
-    doc.text(`Total Paid:      Rs. ${totalPayments.toLocaleString('en-IN')}`, 14, y + 7);
+    doc.text(`Opening Balance: Rs. ${ob.toLocaleString('en-IN')}`, 14, y);
+    doc.text(`Total Purchased: Rs. ${totalPurch.toLocaleString('en-IN')}`, 14, y + 7);
+    doc.text(`Total Paid:      Rs. ${totalPayments.toLocaleString('en-IN')}`, 14, y + 14);
     doc.setFontSize(12);
     doc.setTextColor(outstanding > 0 ? 220 : 16, outstanding > 0 ? 38 : 185, outstanding > 0 ? 38 : 129);
-    doc.text(`Due to Factory: Rs. ${outstanding.toLocaleString('en-IN')}`, 14, y + 16);
+    doc.text(`Due to Factory: Rs. ${outstanding.toLocaleString('en-IN')}`, 14, y + 23);
 
     doc.setFontSize(8); doc.setTextColor(120);
     const genDate = new Date().toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
