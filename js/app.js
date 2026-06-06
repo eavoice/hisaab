@@ -414,14 +414,16 @@ const App = {
     Toast.show('Preparing backup...', 'info');
     const data = await DB.exportAll();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' });
-    const fileName = `Hisaab-Backup-${today()}.txt`;
+    const tsStr = new Date().toISOString().replace(/[:T]/g, '-').substring(0, 19);
+    const fileName = `Hisaab-Backup-${tsStr}.txt`;
+    const jsonFileName = `Hisaab-Backup-${tsStr}.json`;
     const file = new File([blob], fileName, { type: 'text/plain' });
     const canShare = navigator.share && navigator.canShare && navigator.canShare({ files: [file] });
 
     window._hisaabDownloadTemp = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `Hisaab-Backup-${today()}.json`; a.click(); URL.revokeObjectURL(url);
+      a.href = url; a.download = jsonFileName; a.click(); URL.revokeObjectURL(url);
       localStorage.setItem('lastBackupTimestamp', Date.now());
       if (App.currentRoute === 'dashboard') App.navigate('dashboard');
       Toast.show('Backup downloaded', 'success');
@@ -429,7 +431,7 @@ const App = {
     };
     window._hisaabShareTemp = async () => {
       try {
-        await navigator.share({ files: [file], title: 'Hisaab Backup' });
+        await navigator.share({ files: [file], title: fileName });
         localStorage.setItem('lastBackupTimestamp', Date.now());
         if (App.currentRoute === 'dashboard') App.navigate('dashboard');
         Modal.close();

@@ -69,17 +69,21 @@ const DB = (() => {
   async function customerBalance(customerId) {
     const cid = Number(customerId);
     if (!cid) return 0;
+    const c = await getById('customers', cid);
+    const ob = Number(c?.openingBalance) || 0;
     const s = (await getByIndex('sales','customerId',cid)).reduce((a,r)=>a+(r.total||0),0);
     const p = (await getByIndex('salePayments','customerId',cid)).reduce((a,r)=>a+(r.amount||0),0);
-    return s - p;
+    return ob + s - p;
   }
 
   async function factoryBalance(factoryId) {
     const fid = Number(factoryId);
     if (!fid) return 0;
+    const f = await getById('factories', fid);
+    const ob = Number(f?.openingBalance) || 0;
     const p = (await getByIndex('purchases','factoryId',fid)).reduce((a,r)=>a+(r.total||0),0);
     const py= (await getByIndex('purchasePayments','factoryId',fid)).reduce((a,r)=>a+(r.amount||0),0);
-    return p - py;
+    return ob + p - py;
   }
 
   async function exportAll() {

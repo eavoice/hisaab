@@ -1,5 +1,5 @@
 {
-  "name": "Hisaab — Trader's Ledger",
+  "name": "Hisaab",
   "short_name": "Hisaab",
   "description": "Mobile-first trading ledger for sales, purchases, and payments",
   "start_url": "./index.html",

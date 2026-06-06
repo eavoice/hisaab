@@ -4,7 +4,7 @@
 
 function fmt(n) { if(!n&&n!==0)return'₹0'; return'₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:2}); }
 function fmtDate(s){ if(!s)return''; return new Date(s+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
-function today(){ return new Date().toISOString().split('T')[0]; }
+function today(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ---------- Toast ----------
@@ -116,8 +116,8 @@ const CB = {
     }
     const extra = isC
       ? `<div class="form-group"><label class="form-label">City</label><input class="form-input" id="sdlg-city" placeholder="City"></div>
-         <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div>`
-      : `<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div>`;
+         <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div><div class="form-group"><label class="form-label">Opening Balance (To Receive)</label><input class="form-input" id="sdlg-ob" placeholder="0.00" type="number" step="0.01"></div>`
+      : `<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div><div class="form-group"><label class="form-label">Opening Balance (To Pay)</label><input class="form-input" id="sdlg-ob" placeholder="0.00" type="number" step="0.01"></div>`;
     SubDlg.open(`
       <div style="font-size:17px;font-weight:700;margin-bottom:16px">Add ${isC?'Customer':'Factory'}</div>
       <div class="form-group"><label class="form-label">Name *</label>
@@ -136,7 +136,8 @@ const CB = {
     if (!name) return Toast.show('Name is required','error');
     const city  = document.getElementById('sdlg-city')?.value?.trim()||'';
     const phone = document.getElementById('sdlg-phone')?.value?.trim()||'';
-    const data  = store==='customers' ? {name,city,phone} : {name,phone};
+    const openingBalance = parseFloat(document.getElementById('sdlg-ob')?.value) || 0;
+    const data  = store==='customers' ? {name,city,phone,openingBalance} : {name,phone,openingBalance};
     const id    = await DB.add(store, data);
     Toast.show(`"${name}" created`,'success');
     SubDlg.close();
@@ -154,8 +155,8 @@ const CB = {
     const isC = store==='customers', isF = store==='factories';
     const isP = store==='products',  isT = store==='transports';
     let extra = '';
-    if (isC) extra = `<div class="form-group"><label class="form-label">City</label><input class="form-input" id="sdlg-city" placeholder="City"></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div>`;
-    if (isF) extra = `<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div>`;
+    if (isC) extra = `<div class="form-group"><label class="form-label">City</label><input class="form-input" id="sdlg-city" placeholder="City"></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div><div class="form-group"><label class="form-label">Opening Balance (To Receive)</label><input class="form-input" id="sdlg-ob" placeholder="0.00" type="number" step="0.01"></div>`;
+    if (isF) extra = `<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" placeholder="Phone" type="tel"></div><div class="form-group"><label class="form-label">Opening Balance (To Pay)</label><input class="form-input" id="sdlg-ob" placeholder="0.00" type="number" step="0.01"></div>`;
     const label = isC?'Customer':isF?'Factory':isP?'Product':'Transport';
     SubDlg.open(`
       <div style="font-size:17px;font-weight:700;margin-bottom:16px">Add ${label}</div>
@@ -171,8 +172,8 @@ const CB = {
   openMasterEdit(store, id, item) {
     const isC = store==='customers', isF = store==='factories';
     let extra = '';
-    if (isC) extra = `<div class="form-group"><label class="form-label">City</label><input class="form-input" id="sdlg-city" value="${esc(item.city||'')}" placeholder="City"></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" value="${esc(item.phone||'')}" placeholder="Phone" type="tel"></div>`;
-    if (isF) extra = `<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" value="${esc(item.phone||'')}" placeholder="Phone" type="tel"></div>`;
+    if (isC) extra = `<div class="form-group"><label class="form-label">City</label><input class="form-input" id="sdlg-city" value="${esc(item.city||'')}" placeholder="City"></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" value="${esc(item.phone||'')}" placeholder="Phone" type="tel"></div><div class="form-group"><label class="form-label">Opening Balance</label><input class="form-input" id="sdlg-ob" value="${item.openingBalance||''}" placeholder="0.00" type="number" step="0.01"></div>`;
+    if (isF) extra = `<div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="sdlg-phone" value="${esc(item.phone||'')}" placeholder="Phone" type="tel"></div><div class="form-group"><label class="form-label">Opening Balance</label><input class="form-input" id="sdlg-ob" value="${item.openingBalance||''}" placeholder="0.00" type="number" step="0.01"></div>`;
     const label = isC?'Customer':isF?'Factory':store==='products'?'Product':'Transport';
     SubDlg.open(`
       <div style="font-size:17px;font-weight:700;margin-bottom:16px">Edit ${label}</div>
@@ -191,7 +192,8 @@ const CB = {
     const existing = await DB.getById(store, id);
     const city  = document.getElementById('sdlg-city')?.value?.trim()||existing?.city||'';
     const phone = document.getElementById('sdlg-phone')?.value?.trim()||existing?.phone||'';
-    await DB.update(store, { ...existing, name, city, phone });
+    const openingBalance = parseFloat(document.getElementById('sdlg-ob')?.value) || 0;
+    await DB.update(store, { ...existing, name, city, phone, openingBalance });
     Toast.show('Updated','success');
     SubDlg.close();
     const at = document.getElementById('master-list-container')?.dataset?.activeType || store;

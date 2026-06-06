@@ -5,9 +5,10 @@ const Pages = {
 
   async dashboard() {
     let recv=0, pay=0, salesTotal=0, purchTotal=0;
-    const curMonth = new Date().toISOString().substring(0,7);
+    const curMonth = today().substring(0,7);
     const [custs,facts,sales,purch] = await Promise.all([DB.getAll('customers'),DB.getAll('factories'),DB.getAll('sales'),DB.getAll('purchases')]);
     for(const c of custs){ const b=await DB.customerBalance(c.id); if(b>0) recv+=b; }
+    for(const f of facts){ const b=await DB.factoryBalance(f.id); if(b>0) pay+=b; }
     salesTotal = sales.filter(s=>s.date?.startsWith(curMonth)).reduce((a,b)=>a+(b.total||0),0);
     purchTotal = purch.filter(p=>p.date?.startsWith(curMonth)).reduce((a,b)=>a+(b.total||0),0);
 
@@ -17,7 +18,7 @@ const Pages = {
         ${dataArray.map(val => `<div style="flex:1;background:${colorStr};height:${Math.max((val/max)*100, 10)}%;border-radius:2px;transition:height 0.3s"></div>`).join('')}
       </div>`;
     };
-    const last7 = [...Array(7)].map((_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(6-i)); return d.toISOString().substring(0,10); });
+    const last7 = [...Array(7)].map((_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(6-i)); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); });
     const sTrend = last7.map(dt => sales.filter(s=>s.date===dt).reduce((a,b)=>a+(b.total||0),0));
     const pTrend = last7.map(dt => purch.filter(p=>p.date===dt).reduce((a,b)=>a+(b.total||0),0));
 
@@ -184,7 +185,7 @@ const Pages = {
     const tR=salePay.reduce((s,r)=>s+(r.amount||0),0), tPd=purchPay.reduce((s,r)=>s+(r.amount||0),0);
     const gp=tS-tP, nr=tS-tR, np=tP-tPd;
     const now=new Date(); const mm={};
-    for(let i=5;i>=0;i--){ const d=new Date(now.getFullYear(),now.getMonth()-i,1); mm[d.toISOString().substring(0,7)]={s:0,p:0}; }
+    for(let i=5;i>=0;i--){ const d=new Date(now.getFullYear(),now.getMonth()-i,1); const mStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; mm[mStr]={s:0,p:0}; }
     sales.forEach(s=>{const k=s.date?.substring(0,7); if(mm[k]) mm[k].s+=(s.total||0);});
     purch.forEach(p=>{const k=p.date?.substring(0,7); if(mm[k]) mm[k].p+=(p.total||0);});
     const maxV=Math.max(...Object.values(mm).map(v=>Math.max(v.s,v.p)),1);
@@ -332,7 +333,7 @@ const Pages = {
         <label class="form-label">Data Backup</label>
         <button class="btn btn-outline btn-full mb-16" onclick="App.exportData()">⬇ Export Backup</button>
         <button class="btn btn-outline btn-full mb-16" onclick="document.getElementById('import-file').click()">⬆ Import Backup</button>
-        <input type="file" id="import-file" style="display:none" accept=".json" onchange="App.importData(this)">
+        <input type="file" id="import-file" style="display:none" accept=".json,.txt" onchange="App.importData(this)">
         <button class="btn btn-ghost btn-full" style="color:var(--danger);margin-top:10px" onclick="App.clearDatabase()">⚠️ Clear All Data</button>
         <p class="text-sm text-muted" style="line-height:1.6;margin-top:16px">Export saves a JSON file. Store it in Google Drive for safekeeping.</p>`;
     }

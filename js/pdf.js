@@ -10,8 +10,7 @@ const PDF = {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18); doc.setFont('helvetica', 'bold');
     doc.text(companyName || 'Hisaab', 14, 14);
-    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-    doc.text("Trader's Ledger", 14, 20);
+
     doc.setFontSize(12); doc.setFont('helvetica', 'bold');
     doc.text(title, 210 - 14, 12, { align: 'right' });
     doc.setFontSize(9); doc.setFont('helvetica', 'normal');
@@ -73,7 +72,8 @@ const PDF = {
     doc.setFontSize(8); doc.setTextColor(120);
     const genDate = new Date().toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
     doc.text(`Generated on: ${genDate}`, 14, 285);
-    doc.save(`Bill-${sale.billNumber||saleId}.pdf`);
+    const tsStr = new Date().toISOString().replace(/[:T]/g, '-').substring(0, 19);
+    doc.save(`Bill-${sale.billNumber||saleId}_${tsStr}.pdf`);
     return doc;
   },
 
@@ -153,7 +153,8 @@ const PDF = {
     const genDate = new Date().toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
     doc.text(`Generated on: ${genDate}`, 14, 285);
 
-    doc.save(`Ledger-${customer.name || customerId}.pdf`);
+    const tsStr = new Date().toISOString().replace(/[:T]/g, '-').substring(0, 19);
+    doc.save(`Ledger-${customer.name || customerId}_${tsStr}.pdf`);
   },
 
   async factoryLedger(factoryId, fromDate, toDate) {
@@ -228,7 +229,8 @@ const PDF = {
     const genDate = new Date().toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
     doc.text(`Generated on: ${genDate}`, 14, 285);
 
-    doc.save(`Factory-${factory.name || factoryId}.pdf`);
+    const tsStr = new Date().toISOString().replace(/[:T]/g, '-').substring(0, 19);
+    doc.save(`Factory-${factory.name || factoryId}_${tsStr}.pdf`);
   },
 
   // Share via Web Share API (fallback: download)
